@@ -42,7 +42,6 @@ function ETASTRING {
 }
 
 function stop {
-	rm -f $PIDFILE
 	if [ ! -z $PB_PID  ]
 		then
 			kill $PB_PID || true
@@ -67,7 +66,6 @@ function ctrl_c() {
 	echo "------------------------------"
 	
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=0"
-	rm -f $PIDFILE
 	exit 
 }
 
@@ -167,36 +165,6 @@ progress() {
 	fi
 	
 }
-
-pid() {
-	if [ -f $PIDFILE ]
-	then
-	  PID=$(cat $PIDFILE)
-	  ps -p $PID > /dev/null 2>&1
-	  if [ $? -eq 0 ]
-	  then
-		echo "Process already running"
-		exit 1
-	  else
-		## Process not found assume not running
-		echo $$ > $PIDFILE
-		if [ $? -ne 0 ]
-		then
-		  echo "Could not create PID file"
-		  exit 1
-		fi
-	  fi
-	else
-	  echo $$ > $PIDFILE
-	  if [ $? -ne 0 ]
-	  then
-		echo "Could not create PID file"
-		exit 1
-	  fi
-	fi
-}
-
-pid
 
 echo "Checking for updates"
 
@@ -326,5 +294,3 @@ do
 	echo ""
 	sleep 2
 done
-
-rm $PIDFILE
